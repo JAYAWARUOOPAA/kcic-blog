@@ -1,0 +1,40 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-history me-2"></i>Reading History</h1>
+    <p>Articles you've previously read</p>
+  </div>
+</div>
+<div class="breadcrumb-section"><div class="container"><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li><li class="breadcrumb-item"><a href="/user/dashboard">Dashboard</a></li><li class="breadcrumb-item active">History</li></ol></nav></div></div>
+<div class="container py-5">
+  <% if (articles.length === 0) { %>
+  <div class="empty-state bg-white rounded-3 p-5 text-center">
+    <i class="fas fa-history d-block mb-3" style="font-size:56px;color:var(--border)"></i>
+    <h5>No Reading History</h5>
+    <p class="text-muted">Articles you read will appear here. Start exploring!</p>
+    <a href="/articles" class="btn btn-primary mt-2"><i class="fas fa-newspaper me-2"></i>Browse Articles</a>
+  </div>
+  <% } else { %>
+  <div class="admin-table">
+    <div class="admin-table-header"><h6><i class="fas fa-history me-2"></i>Recently Read (<%= articles.length %>)</h6></div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead><tr><th>Article</th><th>Category</th><th>Author</th><th>Reading Time</th><th>Read On</th><th>Action</th></tr></thead>
+        <tbody>
+        <% articles.forEach(art => { %>
+        <tr>
+          <td><div class="fw-500" style="max-width:280px"><%= art.title.substring(0,65)+(art.title.length>65?'...':'') %></div></td>
+          <td><% if(art.category_name){%><span class="article-category" style="background:<%= art.category_color||'var(--primary)' %>;font-size:11px"><%= art.category_name %></span><%}else{%><span class="text-muted">—</span><%}%></td>
+          <td><small><%= art.first_name %> <%= art.last_name %></small></td>
+          <td><small class="text-muted"><i class="fas fa-clock me-1"></i><%= art.reading_time %> min</small></td>
+          <td><small class="text-muted"><%= new Date(art.read_at).toLocaleDateString() %></small></td>
+          <td><a href="/article/<%= art.slug %>" class="btn btn-sm btn-outline-primary"><i class="fas fa-book-open me-1"></i>Read Again</a></td>
+        </tr>
+        <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

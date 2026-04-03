@@ -1,0 +1,61 @@
+<div class="admin-sidebar" id="adminSidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+    <div class="brand-text">
+      <span class="brand-name">KCIC</span>
+      <span class="brand-sub">Admin Panel</span>
+    </div>
+    <button class="sidebar-toggle ms-auto d-lg-none" id="sidebarClose"><i class="fas fa-times"></i></button>
+  </div>
+
+  <div class="sidebar-user">
+    <% if (user.avatar_url) { %>
+      <img src="<%= user.avatar_url %>" class="sidebar-avatar" alt="">
+    <% } else { %>
+      <div class="sidebar-avatar-placeholder"><%= (user.first_name || 'A')[0].toUpperCase() %></div>
+    <% } %>
+    <div class="sidebar-user-info">
+      <strong><%= user.first_name %> <%= user.last_name %></strong>
+      <span><i class="fas fa-shield-alt me-1"></i>Administrator</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a href="/admin/dashboard" class="sidebar-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
+      <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+    </a>
+    <a href="/admin/analytics" class="sidebar-link <%= typeof currentPage !== 'undefined' && currentPage === 'analytics' ? 'active' : '' %>">
+      <i class="fas fa-chart-bar"></i><span>Analytics</span>
+    </a>
+
+    <div class="nav-section-label">Content</div>
+    <a href="/admin/articles" class="sidebar-link <%= typeof currentPage !== 'undefined' && currentPage === 'articles' ? 'active' : '' %>">
+      <i class="fas fa-newspaper"></i><span>Manage Articles</span>
+      <span class="sidebar-badge pending-badge" id="pendingCount"></span>
+    </a>
+    <a href="/admin/categories" class="sidebar-link <%= typeof currentPage !== 'undefined' && currentPage === 'categories' ? 'active' : '' %>">
+      <i class="fas fa-tags"></i><span>Categories</span>
+    </a>
+    <a href="/admin/announcements" class="sidebar-link <%= typeof currentPage !== 'undefined' && currentPage === 'announcements' ? 'active' : '' %>">
+      <i class="fas fa-bullhorn"></i><span>Announcements</span>
+    </a>
+    <a href="/admin/announcements/create" class="sidebar-link">
+      <i class="fas fa-plus-circle"></i><span>New Announcement</span>
+    </a>
+
+    <div class="nav-section-label">People</div>
+    <a href="/admin/users" class="sidebar-link <%= typeof currentPage !== 'undefined' && currentPage === 'users' ? 'active' : '' %>">
+      <i class="fas fa-users"></i><span>Manage Users</span>
+    </a>
+
+    <div class="nav-section-label">Site</div>
+    <a href="/" class="sidebar-link">
+      <i class="fas fa-globe"></i><span>View Site</span>
+    </a>
+    <a href="/auth/logout" class="sidebar-link text-danger">
+      <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+    </a>
+  </nav>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

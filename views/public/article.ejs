@@ -1,0 +1,199 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+
+<!-- Reading Progress Bar -->
+<div style="position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:9999;transition:width 0.1s" id="readingProgress"></div>
+
+<div class="breadcrumb-section">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li>
+        <li class="breadcrumb-item"><a href="/articles">Articles</a></li>
+        <% if (article.category_name) { %><li class="breadcrumb-item"><a href="/articles?category=<%= article.category_slug %>"><%= article.category_name %></a></li><% } %>
+        <li class="breadcrumb-item active text-truncate" style="max-width:200px"><%= article.title %></li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-5">
+
+    <!-- Article Content -->
+    <div class="col-lg-8">
+      <article>
+        <!-- Header -->
+        <div class="mb-4">
+          <% if (article.category_name) { %>
+          <a href="/articles?category=<%= article.category_slug %>" class="article-category mb-3 d-inline-block" style="background:<%= article.category_color||'var(--primary)' %>">
+            <%= article.category_name %>
+          </a>
+          <% } %>
+          <h1 class="article-title"><%= article.title %></h1>
+          <div class="article-meta-bar">
+            <span><i class="fas fa-user-circle"></i>
+              <strong><%= article.first_name %> <%= article.last_name %></strong>
+            </span>
+            <span><i class="fas fa-calendar"></i> <%= new Date(article.published_at||article.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) %></span>
+            <span><i class="fas fa-eye"></i> <%= article.views %> views</span>
+            <span><i class="fas fa-clock"></i> <%= article.reading_time %> min read</span>
+            <span><i class="fas fa-heart"></i> <span id="likeCount"><%= article.likes_count %></span> likes</span>
+            <span><i class="fas fa-comment"></i> <%= article.comments_count %> comments</span>
+          </div>
+          <% if (article.tags && article.tags.length > 0) { %>
+          <div class="mb-3">
+            <% article.tags.forEach(tag => { %><a href="/search?q=<%= tag %>" class="tag-badge">#<%= tag %></a><% }) %>
+          </div>
+          <% } %>
+        </div>
+
+        <!-- Cover Image placeholder -->
+        <div style="background:linear-gradient(135deg,<%= article.category_color||'var(--primary)' %>,var(--primary-dark));height:300px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;margin-bottom:32px;font-size:80px;color:rgba(255,255,255,0.3);">
+          <i class="fas fa-file-alt"></i>
+        </div>
+
+        <!-- Article Body -->
+        <div class="article-content bg-white rounded-3 p-4 p-md-5 shadow-sm">
+          <%- article.content %>
+        </div>
+
+        <!-- Article Footer -->
+        <div class="mt-4 p-4 bg-white rounded-3 shadow-sm">
+          <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center">
+            <div>
+              <% if (article.tags && article.tags.length > 0) { %>
+              <strong style="font-size:13px;">Tags: </strong>
+              <% article.tags.forEach(tag => { %><a href="/search?q=<%= tag %>" class="tag-badge">#<%= tag %></a><% }) %>
+              <% } %>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(article.title) %>&url=<%= encodeURIComponent('') %>" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fab fa-twitter me-1"></i>Tweet</a>
+              <a href="https://www.linkedin.com/sharing/share-offsite/?url=<%= encodeURIComponent('') %>" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fab fa-linkedin me-1"></i>Share</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Author Bio -->
+        <div class="author-card mt-4">
+          <div class="d-flex gap-3">
+            <% if (article.author_avatar) { %>
+              <img src="<%= article.author_avatar %>" class="author-avatar" alt="">
+            <% } else { %>
+              <div class="author-initials" style="flex-shrink:0"><%= (article.first_name||'A')[0] %></div>
+            <% } %>
+            <div>
+              <h6 class="mb-1" style="font-family:var(--font-display);font-weight:700"><%= article.first_name %> <%= article.last_name %></h6>
+              <% if (article.department) { %><p class="text-muted mb-1" style="font-size:13px"><i class="fas fa-university me-1"></i><%= article.department %></p><% } %>
+              <p class="mb-0 text-muted" style="font-size:14px"><%= article.author_bio || 'KCIC academic contributor.' %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="mt-5" id="comments">
+          <h4 class="mb-4" style="font-family:var(--font-display);font-weight:700"><i class="fas fa-comments me-2 text-primary"></i>Comments (<%= comments.length %>)</h4>
+
+          <% if (user) { %>
+          <div class="bg-white rounded-3 p-4 shadow-sm mb-4">
+            <h6 class="mb-3">Leave a Comment</h6>
+            <form action="/article/<%= article.slug %>/comment" method="POST">
+              <div class="mb-3">
+                <textarea name="content" class="form-control" rows="3" placeholder="Share your thoughts on this article..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane me-2"></i>Post Comment</button>
+            </form>
+          </div>
+          <% } else { %>
+          <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i><a href="/auth/login" class="fw-600">Login</a> to leave a comment.
+          </div>
+          <% } %>
+
+          <% if (comments.length === 0) { %>
+          <div class="empty-state">
+            <i class="fas fa-comment-slash d-block mb-2"></i><p>No comments yet. Be the first!</p>
+          </div>
+          <% } else { %>
+          <% comments.forEach(c => { %>
+          <div class="comment-card">
+            <div class="d-flex gap-3">
+              <div class="comment-avatar"><%= (c.first_name||'U')[0] %></div>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <strong style="font-size:14px"><%= c.first_name %> <%= c.last_name %></strong>
+                  <small class="text-muted"><%= new Date(c.created_at).toLocaleDateString() %></small>
+                </div>
+                <p class="mb-0" style="font-size:14px"><%= c.content %></p>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+          <% } %>
+        </div>
+      </article>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Action Buttons -->
+      <div class="article-actions mb-4">
+        <button id="saveBtn" data-article-id="<%= article.id %>" class="action-btn action-btn-save <%= isSaved ? 'saved' : '' %>">
+          <i class="<%= isSaved ? 'fas' : 'far' %> fa-bookmark"></i> <%= isSaved ? 'Saved' : 'Save Article' %>
+        </button>
+        <button id="likeBtn" data-article-id="<%= article.id %>" class="action-btn action-btn-like <%= isLiked ? 'liked' : '' %>">
+          <i class="<%= isLiked ? 'fas' : 'far' %> fa-heart"></i> <span id="likeCount2"><%= article.likes_count %></span> Likes
+        </button>
+        <button id="shareBtn" class="action-btn action-btn-share">
+          <i class="fas fa-share-alt"></i> Share Article
+        </button>
+      </div>
+
+      <!-- Article Info Widget -->
+      <div class="widget">
+        <h6 class="widget-title"><i class="fas fa-info-circle me-2"></i>Article Info</h6>
+        <ul class="list-unstyled mb-0" style="font-size:14px">
+          <li class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted">Published</span>
+            <span><%= new Date(article.published_at||article.created_at).toLocaleDateString() %></span>
+          </li>
+          <li class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted">Reading Time</span>
+            <span><%= article.reading_time %> minutes</span>
+          </li>
+          <li class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted">Views</span>
+            <span><%= article.views %></span>
+          </li>
+          <li class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted">Likes</span>
+            <span><%= article.likes_count %></span>
+          </li>
+          <li class="d-flex justify-content-between py-2">
+            <span class="text-muted">Comments</span>
+            <span><%= article.comments_count %></span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Related Articles -->
+      <% if (related.length > 0) { %>
+      <div class="widget">
+        <h6 class="widget-title"><i class="fas fa-layer-group me-2"></i>Related Articles</h6>
+        <% related.forEach(r => { %>
+        <a href="/article/<%= r.slug %>" class="d-flex gap-3 py-2 border-bottom text-decoration-none" style="color:var(--text-dark)">
+          <div style="width:50px;height:50px;border-radius:8px;background:linear-gradient(135deg,<%= r.category_color||'var(--primary)' %>,var(--primary-dark));display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.7);flex-shrink:0">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <div>
+            <p class="mb-0 fw-500" style="font-size:13px;line-height:1.4"><%= r.title.substring(0,70)+(r.title.length>70?'...':'') %></p>
+            <small class="text-muted"><%= r.first_name %> <%= r.last_name %></small>
+          </div>
+        </a>
+        <% }) %>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

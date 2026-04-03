@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="/public/css/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/admin-sidebar', { user, currentPage }) %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm btn-outline-secondary d-lg-none" id="sidebarToggleBtn"><i class="fas fa-bars"></i></button>
+        <h5><i class="fas fa-bullhorn me-2"></i>Manage Announcements</h5>
+      </div>
+      <a href="/admin/announcements/create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>New Announcement</a>
+    </div>
+    <div class="admin-content">
+      <% if(success){%><div class="alert alert-success alert-auto-dismiss mb-4"><i class="fas fa-check-circle me-2"></i><%= success %></div><%}%>
+
+      <% if(announcements.length===0){ %>
+      <div class="empty-state bg-white rounded-3 p-5 text-center">
+        <i class="fas fa-bullhorn d-block mb-3" style="font-size:56px;color:var(--border)"></i>
+        <h5>No Announcements</h5>
+        <p class="text-muted">Create your first announcement for students.</p>
+        <a href="/admin/announcements/create" class="btn btn-primary mt-2"><i class="fas fa-plus me-2"></i>Create Announcement</a>
+      </div>
+      <% } else { %>
+      <div class="row g-4">
+        <% announcements.forEach(ann => { %>
+        <div class="col-12">
+          <div class="bg-white rounded-3 shadow-sm overflow-hidden" style="border-left:5px solid <%= ann.priority==='urgent'?'var(--danger)':ann.priority==='high'?'#f59e0b':ann.priority==='low'?'var(--success)':'var(--primary)' %>; opacity:<%= ann.is_active ? 1 : 0.6 %>">
+            <div class="p-4">
+              <div class="d-flex justify-content-between align-items-start gap-3">
+                <div class="flex-grow-1">
+                  <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <span class="badge text-white" style="background:<%= ann.priority==='urgent'?'var(--danger)':ann.priority==='high'?'#f59e0b':ann.priority==='low'?'var(--success)':'var(--primary)' %>">
+                      <i class="fas fa-exclamation me-1"></i><%= ann.priority.toUpperCase() %>
+                    </span>
+                    <span class="badge bg-secondary"><i class="fas fa-users me-1"></i>Target: <%= ann.target_role %></span>
+                    <span class="badge <%= ann.is_active ? 'bg-success' : 'bg-secondary' %>">
+                      <i class="fas fa-<%= ann.is_active?'eye':'eye-slash' %> me-1"></i><%= ann.is_active ? 'Active' : 'Hidden' %>
+                    </span>
+                    <% if(ann.expires_at){ %>
+                    <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Expires <%= new Date(ann.expires_at).toLocaleDateString() %></span>
+                    <% } %>
+                  </div>
+                  <h5 style="font-family:var(--font-display);font-weight:700;color:var(--primary-dark)" class="mb-1"><%= ann.title %></h5>
+                  <p class="text-muted mb-2"><%= ann.content.substring(0,200)+(ann.content.length>200?'...':'') %></p>
+                  <small class="text-muted">
+                    <i class="fas fa-user me-1"></i>By <strong><%= ann.first_name %> <%= ann.last_name %></strong>
+                    <i class="fas fa-calendar ms-3 me-1"></i><%= new Date(ann.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) %>
+                  </small>
+                </div>
+                <div class="d-flex flex-column gap-2" style="flex-shrink:0">
+                  <form action="/admin/announcements/<%= ann.id %>/toggle" method="POST">
+                    <button type="submit" class="btn btn-sm <%= ann.is_active?'btn-outline-warning':'btn-outline-success' %> w-100">
+                      <i class="fas fa-<%= ann.is_active?'eye-slash':'eye' %> me-1"></i><%= ann.is_active?'Hide':'Show' %>
+                    </button>
+                  </form>
+                  <form action="/admin/announcements/<%= ann.id %>/delete" method="POST">
+                    <button type="submit" class="btn btn-sm btn-outline-danger w-100" data-confirm="Delete this announcement?">
+                      <i class="fas fa-trash me-1"></i>Delete
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/public/js/main.js"></script>
+</body>
+</html>

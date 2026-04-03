@@ -1,0 +1,40 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-bookmark me-2"></i>Saved Articles</h1>
+    <p>Articles you've bookmarked for later reading</p>
+  </div>
+</div>
+<div class="breadcrumb-section"><div class="container"><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li><li class="breadcrumb-item"><a href="/user/dashboard">Dashboard</a></li><li class="breadcrumb-item active">Saved</li></ol></nav></div></div>
+<div class="container py-5">
+  <% if (articles.length === 0) { %>
+  <div class="empty-state bg-white rounded-3 p-5 text-center">
+    <i class="fas fa-bookmark d-block mb-3" style="font-size:56px;color:var(--border)"></i>
+    <h5>No Saved Articles</h5>
+    <p class="text-muted">Start saving articles by clicking the bookmark button on any article.</p>
+    <a href="/articles" class="btn btn-primary mt-2"><i class="fas fa-newspaper me-2"></i>Browse Articles</a>
+  </div>
+  <% } else { %>
+  <div class="row g-4">
+    <% articles.forEach(art => { %>
+    <div class="col-md-6 col-lg-4">
+      <div class="article-card h-100">
+        <div class="article-card-img" style="background:linear-gradient(135deg,<%= art.category_color||'var(--primary)' %>,var(--primary-dark))">
+          <div class="article-card-img-placeholder"><i class="fas fa-file-alt"></i></div>
+        </div>
+        <div class="article-card-body">
+          <% if(art.category_name){%><span class="article-category" style="background:<%= art.category_color||'var(--primary)' %>"><%= art.category_name %></span><%}%>
+          <h3 class="article-card-title"><a href="/article/<%= art.slug %>"><%= art.title %></a></h3>
+          <p class="article-card-excerpt"><%= (art.excerpt||'').substring(0,100)+'...' %></p>
+          <div class="article-card-meta">
+            <div class="article-meta-author"><i class="fas fa-user-circle"></i><%= art.first_name %> <%= art.last_name %></div>
+            <small class="text-muted">Saved <%= new Date(art.saved_at).toLocaleDateString() %></small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

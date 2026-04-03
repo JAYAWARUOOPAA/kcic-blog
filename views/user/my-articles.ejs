@@ -1,0 +1,76 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+<div class="page-header">
+  <div class="container d-flex justify-content-between align-items-center">
+    <div><h1><i class="fas fa-file-alt me-2"></i>My Articles</h1><p>Manage all your submitted articles</p></div>
+    <a href="/user/create-article" class="btn btn-light px-4"><i class="fas fa-plus me-2"></i>New Article</a>
+  </div>
+</div>
+<div class="breadcrumb-section"><div class="container"><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li><li class="breadcrumb-item"><a href="/user/dashboard">Dashboard</a></li><li class="breadcrumb-item active">My Articles</li></ol></nav></div></div>
+
+<div class="container py-5">
+  <% if (success) { %><div class="alert alert-success alert-auto-dismiss mb-4"><i class="fas fa-check-circle me-2"></i><%= success %></div><% } %>
+
+  <% if (articles.length === 0) { %>
+  <div class="empty-state bg-white rounded-3 p-5 text-center">
+    <i class="fas fa-pen-nib d-block mb-3" style="font-size:56px;color:var(--border)"></i>
+    <h5>No Articles Yet</h5>
+    <p class="text-muted">You haven't written any articles. Start contributing to the KCIC community!</p>
+    <a href="/user/create-article" class="btn btn-primary px-5 mt-2"><i class="fas fa-plus me-2"></i>Write Your First Article</a>
+  </div>
+  <% } else { %>
+  <div class="admin-table">
+    <div class="admin-table-header">
+      <h6><i class="fas fa-list me-2"></i>All My Articles (<%= articles.length %>)</h6>
+      <input type="text" id="tableSearch" class="form-control form-control-sm" placeholder="Filter articles..." style="width:200px">
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Views</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        <% articles.forEach(art => { %>
+        <tr class="searchable-row">
+          <td>
+            <div class="fw-500" style="max-width:300px">
+              <%= art.title.substring(0,70)+(art.title.length>70?'...':'') %>
+            </div>
+            <% if (art.status === 'rejected' && art.rejection_reason) { %>
+            <div class="mt-1 p-2 rounded" style="background:#fff5f5;font-size:12px;color:var(--danger)">
+              <i class="fas fa-times-circle me-1"></i><strong>Rejection Reason:</strong> <%= art.rejection_reason %>
+            </div>
+            <% } %>
+          </td>
+          <td><small class="text-muted"><%= art.category_name||'Uncategorized' %></small></td>
+          <td><span class="status-badge status-<%= art.status %>"><%= art.status %></span></td>
+          <td><span class="text-muted"><i class="fas fa-eye me-1"></i><%= art.views||0 %></span></td>
+          <td><small class="text-muted"><%= new Date(art.created_at).toLocaleDateString() %></small></td>
+          <td>
+            <div class="d-flex gap-1 flex-wrap">
+              <% if (art.status === 'published') { %>
+              <a href="/article/<%= art.slug %>" class="btn btn-sm btn-outline-primary" title="View Article"><i class="fas fa-eye"></i></a>
+              <% } %>
+              <% if (art.status !== 'published') { %>
+              <a href="/user/edit-article/<%= art.id %>" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fas fa-edit"></i></a>
+              <% } %>
+              <form action="/user/delete-article/<%= art.id %>" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-outline-danger" data-confirm="Delete this article? This cannot be undone." title="Delete"><i class="fas fa-trash"></i></button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

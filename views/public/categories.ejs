@@ -1,0 +1,32 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-tags me-2"></i>Categories</h1>
+    <p>Browse articles organized by academic discipline</p>
+  </div>
+</div>
+<div class="breadcrumb-section"><div class="container"><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li><li class="breadcrumb-item active">Categories</li></ol></nav></div></div>
+
+<div class="container py-5">
+  <div class="row g-4">
+    <% categories.forEach(cat => { %>
+    <div class="col-lg-3 col-md-4 col-sm-6">
+      <a href="/articles?category=<%= cat.slug %>" class="category-card" style="text-decoration:none">
+        <div class="category-icon-wrap" style="background:<%= cat.color||'var(--primary)' %>">
+          <i class="<%= cat.icon||'fas fa-folder' %>"></i>
+        </div>
+        <div class="category-name"><%= cat.name %></div>
+        <div class="category-count"><%= cat.article_count %> article<%= cat.article_count!=1?'s':'' %></div>
+        <% if (cat.description) { %><p class="mt-2 mb-0 text-muted" style="font-size:12px;line-height:1.4"><%= cat.description.substring(0,80) %>...</p><% } %>
+        <div class="mt-3">
+          <span class="btn btn-sm" style="background:<%= cat.color||'var(--primary)' %>;color:white;font-size:12px">Explore <i class="fas fa-arrow-right ms-1"></i></span>
+        </div>
+      </a>
+    </div>
+    <% }) %>
+    <% if (categories.length === 0) { %>
+    <div class="col-12"><div class="empty-state"><i class="fas fa-folder-open d-block mb-3"></i><h5>No Categories Yet</h5><p>Categories will appear here once created.</p></div></div>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

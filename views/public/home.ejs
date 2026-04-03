@@ -1,0 +1,184 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+
+<!-- HERO -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7 hero-content">
+        <div class="hero-tag"><i class="fas fa-star me-1"></i> Official Academic Blog</div>
+        <h1 class="hero-title">Kings Cornerstone<br><span>Academic Blog</span></h1>
+        <p class="hero-subtitle">A platform for scholarly discourse, research sharing, and academic excellence at Kings Cornerstone International College.</p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="/articles" class="btn btn-light px-4 py-2 fw-600"><i class="fas fa-newspaper me-2"></i>Browse Articles</a>
+          <% if (!user) { %><a href="/auth/register" class="btn btn-outline-light px-4 py-2 fw-600"><i class="fas fa-user-plus me-2"></i>Join Now</a><% } %>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><span class="hero-stat-num"><%= stats.total_articles || '0' %>+</span><span class="hero-stat-label">Articles</span></div>
+          <div class="hero-stat"><span class="hero-stat-num"><%= stats.total_students || '0' %>+</span><span class="hero-stat-label">Students</span></div>
+          <div class="hero-stat"><span class="hero-stat-num"><%= stats.total_categories || '0' %>+</span><span class="hero-stat-label">Categories</span></div>
+        </div>
+      </div>
+      <div class="col-lg-5 mt-5 mt-lg-0">
+        <div class="hero-search">
+          <p class="hero-search-title"><i class="fas fa-search me-2"></i>Search Articles</p>
+          <form action="/search" method="GET">
+            <input type="text" name="q" class="hero-search-input" placeholder="Search by topic, author, keyword...">
+            <button type="submit" class="hero-search-btn"><i class="fas fa-search me-2"></i>Search</button>
+          </form>
+          <div class="mt-3 d-flex flex-wrap gap-2">
+            <span style="font-size:12px;color:var(--text-muted)">Popular:</span>
+            <% ['Research', 'Technology', 'Science', 'Business'].forEach(t => { %><a href="/search?q=<%= t %>" class="tag-badge"><%= t %></a><% }) %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANNOUNCEMENTS -->
+<% if (announcements.length > 0) { %>
+<div class="container mt-4">
+  <% announcements.forEach(ann => { %>
+  <div class="announcement-banner <%= ann.priority %>">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="priority-badge bg-<%= ann.priority === 'urgent' ? 'danger' : ann.priority === 'high' ? 'warning' : ann.priority === 'low' ? 'success' : 'primary' %> text-white">
+            <i class="fas fa-bullhorn me-1"></i><%= ann.priority.toUpperCase() %>
+          </span>
+          <span class="announcement-title"><%= ann.title %></span>
+        </div>
+        <p class="mb-0 announcement-meta"><%= ann.content.substring(0, 200) %><%= ann.content.length > 200 ? '...' : '' %></p>
+      </div>
+      <button class="btn-close announcement-dismiss ms-3" style="flex-shrink:0"></button>
+    </div>
+  </div>
+  <% }) %>
+</div>
+<% } %>
+
+<!-- FEATURED ARTICLES -->
+<% if (featured.length > 0) { %>
+<section class="py-5">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label"><i class="fas fa-star me-1"></i>Featured</div>
+      <h2 class="section-title">Editor's <span>Picks</span></h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="row g-4">
+      <% featured.forEach((art, i) => { %>
+      <div class="col-lg-<%= i === 0 ? '6' : '3' %>">
+        <div class="featured-card">
+          <% if (i === 0) { %>
+            <div style="background: linear-gradient(135deg, <%= art.category_color || 'var(--primary)' %>, var(--primary-dark)); height: 100%; display:flex; align-items:center; justify-content:center; font-size:64px; color:rgba(255,255,255,0.3);">
+              <i class="fas fa-file-alt"></i>
+            </div>
+          <% } else { %>
+            <div style="background: linear-gradient(135deg, <%= art.category_color || 'var(--primary-light)' %>, var(--primary)); height:100%; display:flex; align-items:center; justify-content:center; font-size:48px; color:rgba(255,255,255,0.3);">
+              <i class="fas fa-file-alt"></i>
+            </div>
+          <% } %>
+          <div class="featured-badge"><i class="fas fa-star me-1"></i>Featured</div>
+          <div class="featured-card-overlay">
+            <% if (art.category_name) { %><span class="article-category mb-2" style="background:<%= art.category_color %>"><%= art.category_name %></span><% } %>
+            <h3 class="featured-card-title"><a href="/article/<%= art.slug %>"><%= art.title %></a></h3>
+            <div class="featured-card-meta">
+              <i class="fas fa-user me-1"></i><%= art.first_name %> <%= art.last_name %>
+              <span class="ms-2"><i class="fas fa-eye me-1"></i><%= art.views %></span>
+              <span class="ms-2"><i class="fas fa-heart me-1"></i><%= art.likes_count %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- RECENT ARTICLES -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div class="section-header mb-0">
+        <div class="section-label"><i class="fas fa-clock me-1"></i>Latest</div>
+        <h2 class="section-title">Recent <span>Articles</span></h2>
+        <div class="section-divider"></div>
+      </div>
+      <a href="/articles" class="btn btn-outline-primary btn-sm">View All <i class="fas fa-arrow-right ms-1"></i></a>
+    </div>
+    <% if (articles.length === 0) { %>
+      <div class="empty-state"><i class="fas fa-newspaper d-block mb-3"></i><p>No articles published yet.</p></div>
+    <% } else { %>
+    <div class="row g-4">
+      <% articles.forEach(art => { %>
+      <div class="col-lg-4 col-md-6">
+        <div class="article-card">
+          <div class="article-card-img" style="background: linear-gradient(135deg, <%= art.category_color || 'var(--primary)' %>, var(--primary-dark));">
+            <div class="article-card-img-placeholder"><i class="fas fa-file-alt"></i></div>
+          </div>
+          <div class="article-card-body">
+            <% if (art.category_name) { %><a href="/articles?category=<%= art.category_slug %>" class="article-category" style="background:<%= art.category_color || 'var(--primary)' %>"><%= art.category_name %></a><% } %>
+            <h3 class="article-card-title"><a href="/article/<%= art.slug %>"><%= art.title %></a></h3>
+            <p class="article-card-excerpt"><%= art.excerpt ? art.excerpt.substring(0,120)+'...' : art.content.replace(/<[^>]+>/g,'').substring(0,120)+'...' %></p>
+            <div class="article-card-meta">
+              <div class="article-meta-author"><i class="fas fa-user-circle"></i><%= art.first_name %> <%= art.last_name %></div>
+              <div class="article-meta-stats">
+                <span><i class="fas fa-eye"></i><%= art.views %></span>
+                <span><i class="fas fa-heart"></i><%= art.likes_count %></span>
+                <span><i class="fas fa-comment"></i><%= art.comments_count %></span>
+                <span class="reading-time"><i class="fas fa-clock"></i><%= art.reading_time %>m</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<% if (categories.length > 0) { %>
+<section class="py-5">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label"><i class="fas fa-tags me-1"></i>Explore</div>
+      <h2 class="section-title">Browse by <span>Category</span></h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="row g-3">
+      <% categories.slice(0,8).forEach(cat => { %>
+      <div class="col-lg-3 col-md-4 col-6">
+        <a href="/articles?category=<%= cat.slug %>" class="category-card">
+          <div class="category-icon-wrap" style="background:<%= cat.color || 'var(--primary)' %>">
+            <i class="<%= cat.icon || 'fas fa-folder' %>"></i>
+          </div>
+          <div class="category-name"><%= cat.name %></div>
+          <div class="category-count"><%= cat.article_count %> articles</div>
+        </a>
+      </div>
+      <% }) %>
+    </div>
+    <div class="text-center mt-4">
+      <a href="/categories" class="btn btn-outline-primary">View All Categories <i class="fas fa-arrow-right ms-1"></i></a>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- CTA -->
+<% if (!user) { %>
+<section class="py-5" style="background: linear-gradient(135deg, var(--primary-dark), var(--primary));">
+  <div class="container text-center py-3">
+    <h2 class="section-title text-white mb-3" style="font-family:var(--font-display)">Join KCIC Academic Community</h2>
+    <p style="color:rgba(255,255,255,0.8); max-width:500px; margin: 0 auto 24px;">Share your research, insights, and academic work with the KCIC community. Create your account and start contributing today.</p>
+    <a href="/auth/register" class="btn btn-light px-5 py-3 fw-600 me-3"><i class="fas fa-user-plus me-2"></i>Create Account</a>
+    <a href="/auth/login" class="btn btn-outline-light px-5 py-3 fw-600"><i class="fas fa-sign-in-alt me-2"></i>Login</a>
+  </div>
+</section>
+<% } %>
+
+<%- include('../partials/footer') %>

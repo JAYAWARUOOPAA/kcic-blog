@@ -1,0 +1,94 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-pen-nib me-2"></i>Write New Article</h1>
+    <p>Share your research and insights with the KCIC academic community</p>
+  </div>
+</div>
+<div class="breadcrumb-section"><div class="container"><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li><li class="breadcrumb-item"><a href="/user/dashboard">Dashboard</a></li><li class="breadcrumb-item active">New Article</li></ol></nav></div></div>
+
+<div class="container py-5">
+  <% if (error) { %><div class="alert alert-danger mb-4"><i class="fas fa-exclamation-circle me-2"></i><%= error %></div><% } %>
+  <form action="/user/create-article" method="POST" id="articleForm">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+          <div class="mb-4">
+            <label class="form-label fw-600"><i class="fas fa-heading me-1"></i>Article Title <span class="text-danger">*</span></label>
+            <input type="text" name="title" class="form-control form-control-lg" placeholder="Enter a compelling title for your article..." required maxlength="500">
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-600"><i class="fas fa-quote-left me-1"></i>Excerpt / Summary</label>
+            <textarea name="excerpt" id="articleExcerpt" class="form-control" rows="3" placeholder="Brief summary (appears in article previews)..." maxlength="300"></textarea>
+            <div class="form-text text-end"><span id="excerptCount">0</span>/300 characters</div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label fw-600"><i class="fas fa-align-left me-1"></i>Article Content <span class="text-danger">*</span></label>
+            <div class="editor-toolbar">
+              <button class="editor-btn" data-action="bold" title="Bold"><i class="fas fa-bold"></i></button>
+              <button class="editor-btn" data-action="italic" title="Italic"><i class="fas fa-italic"></i></button>
+              <button class="editor-btn" data-action="h2" title="Heading 2"><i class="fas fa-heading"></i> H2</button>
+              <button class="editor-btn" data-action="h3" title="Heading 3"><i class="fas fa-heading"></i> H3</button>
+              <button class="editor-btn" data-action="link" title="Insert Link"><i class="fas fa-link"></i></button>
+              <button class="editor-btn" data-action="quote" title="Blockquote"><i class="fas fa-quote-right"></i></button>
+              <button class="editor-btn" data-action="code" title="Code"><i class="fas fa-code"></i></button>
+              <button class="editor-btn" data-action="list" title="List"><i class="fas fa-list-ul"></i></button>
+              <button class="editor-btn" data-action="hr" title="Divider"><i class="fas fa-minus"></i></button>
+            </div>
+            <textarea name="content" id="articleContent" class="form-control" rows="20" placeholder="Write your article here... You can use Markdown formatting." required></textarea>
+            <div class="form-text"><i class="fas fa-info-circle me-1"></i>Supports HTML and Markdown. Use the toolbar above for quick formatting.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+          <h6 style="font-family:var(--font-display);font-weight:700;color:var(--primary)" class="mb-3"><i class="fas fa-cog me-2"></i>Article Settings</h6>
+          <div class="mb-3">
+            <label class="form-label fw-600">Category</label>
+            <select name="category_id" class="form-select">
+              <option value="">— Select Category —</option>
+              <% categories.forEach(cat => { %>
+              <option value="<%= cat.id %>"><%= cat.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-600"><i class="fas fa-tags me-1"></i>Tags</label>
+            <input type="text" name="tags" class="form-control" placeholder="research, science, technology (comma separated)">
+            <div class="form-text">Comma-separated tags to help readers find your article.</div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-600"><i class="fas fa-paper-plane me-1"></i>Submission</label>
+            <div class="d-grid gap-2">
+              <button type="submit" name="status" value="pending" class="btn btn-primary">
+                <i class="fas fa-send me-2"></i>Submit for Review
+              </button>
+              <button type="submit" name="status" value="draft" class="btn btn-outline-secondary">
+                <i class="fas fa-save me-2"></i>Save as Draft
+              </button>
+            </div>
+          </div>
+          <div class="alert alert-info p-3" style="font-size:13px">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Submission Process:</strong><br>
+            Your article will be reviewed by our editorial team. Approved articles will be published on the blog. This typically takes 3–5 business days.
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3 shadow-sm p-4">
+          <h6 style="font-family:var(--font-display);font-weight:700;color:var(--primary)" class="mb-3"><i class="fas fa-book me-2"></i>Writing Tips</h6>
+          <ul class="list-unstyled mb-0" style="font-size:13px;color:var(--text-muted)">
+            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Write a clear, descriptive title</li>
+            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Start with a strong introduction</li>
+            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Use headings to organize content</li>
+            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Include citations and references</li>
+            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Minimum 500 words recommended</li>
+            <li><i class="fas fa-check-circle text-success me-2"></i>Proofread before submitting</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<%- include('../partials/footer') %>

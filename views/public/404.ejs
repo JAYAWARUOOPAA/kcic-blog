@@ -1,0 +1,12 @@
+<%- include('../partials/header', { title: '404 - Page Not Found', user: user||null, currentPage:'' }) %>
+<div style="min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px">
+  <div>
+    <div style="font-size:120px;font-weight:800;color:var(--primary);opacity:0.15;font-family:var(--font-display);line-height:1">404</div>
+    <i class="fas fa-search-minus fa-4x mb-4" style="color:var(--primary);opacity:0.5;margin-top:-30px;display:block"></i>
+    <h2 style="font-family:var(--font-display);color:var(--primary-dark)">Page Not Found</h2>
+    <p class="text-muted mb-4">The page you're looking for doesn't exist or has been moved.</p>
+    <a href="/" class="btn btn-primary px-5 me-2"><i class="fas fa-home me-2"></i>Go Home</a>
+    <a href="/articles" class="btn btn-outline-primary px-5"><i class="fas fa-newspaper me-2"></i>Browse Articles</a>
+  </div>
+</div>
+<%- include('../partials/footer') %>

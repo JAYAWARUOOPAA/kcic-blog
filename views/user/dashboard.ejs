@@ -1,0 +1,130 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+
+<div class="page-header">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1><i class="fas fa-tachometer-alt me-2"></i>My Dashboard</h1>
+        <p>Welcome back, <%= user.first_name %>! Manage your academic contributions.</p>
+      </div>
+      <a href="/user/create-article" class="btn btn-light px-4"><i class="fas fa-plus me-2"></i>New Article</a>
+    </div>
+  </div>
+</div>
+<div class="breadcrumb-section"><div class="container"><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li><li class="breadcrumb-item active">Dashboard</li></ol></nav></div></div>
+
+<div class="container py-5">
+
+  <!-- Notifications -->
+  <% if (notifications && notifications.length > 0) { %>
+  <div class="mb-4">
+    <% notifications.forEach(n => { %>
+    <div class="alert alert-<%= n.type==='article_approved'?'success':'warning' %> d-flex justify-content-between align-items-center">
+      <div><i class="fas fa-<%= n.type==='article_approved'?'check-circle':'info-circle' %> me-2"></i><strong><%= n.title %></strong> — <%= n.message %></div>
+      <button onclick="fetch('/api/notifications/<%= n.id %>/read',{method:'POST'}).then(()=>this.closest('.alert').remove())" class="btn-close"></button>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <!-- Stats -->
+  <div class="row g-4 mb-5">
+    <div class="col-6 col-lg-3">
+      <div class="dashboard-stat-card">
+        <div class="dashboard-stat-num text-success"><%= stats.published||0 %></div>
+        <div class="dashboard-stat-label"><i class="fas fa-check-circle me-1 text-success"></i>Published</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="dashboard-stat-card">
+        <div class="dashboard-stat-num text-warning"><%= stats.pending||0 %></div>
+        <div class="dashboard-stat-label"><i class="fas fa-clock me-1 text-warning"></i>Pending Review</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="dashboard-stat-card">
+        <div class="dashboard-stat-num" style="color:var(--primary)"><%= saved_count||0 %></div>
+        <div class="dashboard-stat-label"><i class="fas fa-bookmark me-1" style="color:var(--primary)"></i>Saved Articles</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="dashboard-stat-card">
+        <div class="dashboard-stat-num text-info"><%= history_count||0 %></div>
+        <div class="dashboard-stat-label"><i class="fas fa-history me-1 text-info"></i>Articles Read</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- My Recent Articles -->
+    <div class="col-lg-8">
+      <div class="admin-table">
+        <div class="admin-table-header">
+          <h6><i class="fas fa-file-alt me-2"></i>My Recent Articles</h6>
+          <a href="/user/my-articles" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <% if (articles.length === 0) { %>
+        <div class="empty-state p-4">
+          <i class="fas fa-pen-nib d-block mb-2" style="font-size:36px;opacity:0.3"></i>
+          <p>You haven't written any articles yet.</p>
+          <a href="/user/create-article" class="btn btn-primary btn-sm">Write Your First Article</a>
+        </div>
+        <% } else { %>
+        <div class="table-responsive">
+          <table class="table">
+            <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody>
+            <% articles.forEach(art => { %>
+            <tr>
+              <td>
+                <div class="fw-500" style="max-width:250px"><%= art.title.substring(0,60)+(art.title.length>60?'...':'') %></div>
+              </td>
+              <td><small class="text-muted"><%= art.category_name||'Uncategorized' %></small></td>
+              <td>
+                <span class="status-badge status-<%= art.status %>"><%= art.status %></span>
+                <% if (art.status==='rejected' && art.rejection_reason) { %>
+                <br><small class="text-danger" title="<%= art.rejection_reason %>"><i class="fas fa-info-circle"></i> Rejection reason</small>
+                <% } %>
+              </td>
+              <td><small class="text-muted"><%= new Date(art.created_at).toLocaleDateString() %></small></td>
+              <td>
+                <div class="d-flex gap-1">
+                  <% if (art.status==='published') { %><a href="/article/<%= art.slug %>" class="btn btn-xs btn-outline-primary p-1" title="View"><i class="fas fa-eye"></i></a><% } %>
+                  <% if (art.status!=='published') { %><a href="/user/edit-article/<%= art.id %>" class="btn btn-xs btn-outline-secondary p-1" title="Edit"><i class="fas fa-edit"></i></a><% } %>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Quick Actions Sidebar -->
+    <div class="col-lg-4">
+      <div class="widget mb-4" style="background:linear-gradient(135deg,var(--primary),var(--primary-light));color:white">
+        <h6 style="color:white;font-family:var(--font-display)"><i class="fas fa-rocket me-2"></i>Quick Actions</h6>
+        <div class="d-grid gap-2 mt-3">
+          <a href="/user/create-article" class="btn btn-light btn-sm"><i class="fas fa-plus me-2"></i>Write New Article</a>
+          <a href="/user/my-articles" class="btn btn-outline-light btn-sm"><i class="fas fa-file-alt me-2"></i>Manage My Articles</a>
+          <a href="/user/saved" class="btn btn-outline-light btn-sm"><i class="fas fa-bookmark me-2"></i>Saved Articles</a>
+          <a href="/user/history" class="btn btn-outline-light btn-sm"><i class="fas fa-history me-2"></i>Reading History</a>
+          <a href="/user/profile" class="btn btn-outline-light btn-sm"><i class="fas fa-user-edit me-2"></i>Edit Profile</a>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h6 class="widget-title"><i class="fas fa-info-circle me-2"></i>Article Status Guide</h6>
+        <ul class="list-unstyled mb-0" style="font-size:13px">
+          <li class="d-flex align-items-center gap-2 py-2 border-bottom"><span class="status-badge status-draft">Draft</span>Saved but not submitted</li>
+          <li class="d-flex align-items-center gap-2 py-2 border-bottom"><span class="status-badge status-pending">Pending</span>Awaiting admin review</li>
+          <li class="d-flex align-items-center gap-2 py-2 border-bottom"><span class="status-badge status-published">Published</span>Live and visible to all</li>
+          <li class="d-flex align-items-center gap-2 py-2"><span class="status-badge status-rejected">Rejected</span>Not approved — can edit & resubmit</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

@@ -1,0 +1,52 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-bullhorn me-2"></i>Announcements</h1>
+    <p>Stay updated with the latest news and notices from KCIC</p>
+  </div>
+</div>
+<div class="breadcrumb-section"><div class="container"><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li><li class="breadcrumb-item active">Announcements</li></ol></nav></div></div>
+
+<div class="container py-5">
+  <% if (announcements.length === 0) { %>
+  <div class="empty-state bg-white rounded-3 p-5">
+    <i class="fas fa-bullhorn d-block mb-3" style="font-size:56px;color:var(--border)"></i>
+    <h5>No Announcements</h5>
+    <p class="text-muted">There are no active announcements at this time.</p>
+  </div>
+  <% } else { %>
+  <div class="row g-4">
+    <% announcements.forEach(ann => { %>
+    <div class="col-12">
+      <div class="bg-white rounded-3 shadow-sm overflow-hidden" style="border-left:5px solid <%= ann.priority==='urgent'?'var(--danger)':ann.priority==='high'?'var(--warning)':ann.priority==='low'?'var(--success)':'var(--primary)' %>">
+        <div class="p-4">
+          <div class="d-flex flex-wrap gap-3 align-items-start justify-content-between">
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge text-white" style="background:<%= ann.priority==='urgent'?'var(--danger)':ann.priority==='high'?'var(--warning)':ann.priority==='low'?'var(--success)':'var(--primary)' %>">
+                  <i class="fas fa-<%= ann.priority==='urgent'?'exclamation-circle':ann.priority==='high'?'exclamation-triangle':ann.priority==='low'?'info-circle':'bullhorn' %> me-1"></i>
+                  <%= ann.priority.toUpperCase() %>
+                </span>
+                <% if (ann.target_role !== 'all') { %>
+                <span class="badge bg-secondary"><i class="fas fa-user me-1"></i><%= ann.target_role %> only</span>
+                <% } %>
+              </div>
+              <h4 style="font-family:var(--font-display);font-weight:700;color:var(--primary-dark)"><%= ann.title %></h4>
+              <p class="mb-2"><%= ann.content %></p>
+              <div class="d-flex gap-3 text-muted" style="font-size:13px">
+                <span><i class="fas fa-user me-1"></i>Posted by <strong><%= ann.first_name %> <%= ann.last_name %></strong></span>
+                <span><i class="fas fa-calendar me-1"></i><%= new Date(ann.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) %></span>
+                <% if (ann.expires_at) { %>
+                <span><i class="fas fa-clock me-1"></i>Expires: <%= new Date(ann.expires_at).toLocaleDateString() %></span>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

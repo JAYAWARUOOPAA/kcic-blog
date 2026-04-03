@@ -1,0 +1,87 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-edit me-2"></i>Edit Article</h1>
+    <p>Update your article and resubmit for review</p>
+  </div>
+</div>
+<div class="breadcrumb-section"><div class="container"><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li><li class="breadcrumb-item"><a href="/user/dashboard">Dashboard</a></li><li class="breadcrumb-item"><a href="/user/my-articles">My Articles</a></li><li class="breadcrumb-item active">Edit</li></ol></nav></div></div>
+
+<div class="container py-5">
+  <% if (error) { %><div class="alert alert-danger mb-4"><i class="fas fa-exclamation-circle me-2"></i><%= error %></div><% } %>
+  <% if (article.status === 'rejected') { %>
+  <div class="alert alert-warning mb-4">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <strong>This article was rejected.</strong>
+    <% if (article.rejection_reason) { %> Reason: <em><%= article.rejection_reason %></em><% } %>
+    Make changes and resubmit for review.
+  </div>
+  <% } %>
+
+  <form action="/user/edit-article/<%= article.id %>" method="POST">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+          <div class="mb-4">
+            <label class="form-label fw-600">Article Title <span class="text-danger">*</span></label>
+            <input type="text" name="title" class="form-control form-control-lg" value="<%= article.title %>" required maxlength="500">
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-600">Excerpt / Summary</label>
+            <textarea name="excerpt" id="articleExcerpt" class="form-control" rows="3" maxlength="300"><%= article.excerpt||'' %></textarea>
+            <div class="form-text text-end"><span id="excerptCount"><%= article.excerpt ? article.excerpt.length : 0 %></span>/300</div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label fw-600">Article Content <span class="text-danger">*</span></label>
+            <div class="editor-toolbar">
+              <button class="editor-btn" data-action="bold"><i class="fas fa-bold"></i></button>
+              <button class="editor-btn" data-action="italic"><i class="fas fa-italic"></i></button>
+              <button class="editor-btn" data-action="h2"><i class="fas fa-heading"></i> H2</button>
+              <button class="editor-btn" data-action="h3"><i class="fas fa-heading"></i> H3</button>
+              <button class="editor-btn" data-action="link"><i class="fas fa-link"></i></button>
+              <button class="editor-btn" data-action="quote"><i class="fas fa-quote-right"></i></button>
+              <button class="editor-btn" data-action="code"><i class="fas fa-code"></i></button>
+              <button class="editor-btn" data-action="list"><i class="fas fa-list-ul"></i></button>
+            </div>
+            <textarea name="content" id="articleContent" class="form-control" rows="20" required><%= article.content %></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+          <h6 style="font-family:var(--font-display);font-weight:700;color:var(--primary)" class="mb-3">Article Settings</h6>
+          <div class="mb-3">
+            <label class="form-label fw-600">Category</label>
+            <select name="category_id" class="form-select">
+              <option value="">— Select Category —</option>
+              <% categories.forEach(cat => { %>
+              <option value="<%= cat.id %>" <%= article.category_id == cat.id ? 'selected' : '' %>><%= cat.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-600">Tags</label>
+            <input type="text" name="tags" class="form-control" value="<%= article.tags ? article.tags.join(', ') : '' %>" placeholder="comma separated">
+          </div>
+          <div class="mb-3">
+            <div class="p-3 rounded-3" style="background:#f0f7ff;font-size:13px">
+              <strong>Current Status:</strong> <span class="status-badge status-<%= article.status %>"><%= article.status %></span>
+            </div>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" name="status" value="pending" class="btn btn-primary">
+              <i class="fas fa-paper-plane me-2"></i>Save & Resubmit for Review
+            </button>
+            <button type="submit" name="status" value="draft" class="btn btn-outline-secondary">
+              <i class="fas fa-save me-2"></i>Save as Draft
+            </button>
+            <a href="/user/my-articles" class="btn btn-outline-danger">
+              <i class="fas fa-times me-2"></i>Cancel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<%- include('../partials/footer') %>

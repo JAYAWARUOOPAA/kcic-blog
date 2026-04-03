@@ -1,0 +1,144 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-newspaper me-2"></i>Articles</h1>
+    <p>Explore academic research and scholarly articles from KCIC students and faculty</p>
+  </div>
+</div>
+
+<div class="breadcrumb-section">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li>
+        <li class="breadcrumb-item active">Articles</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-4">
+
+    <!-- Main Content -->
+    <div class="col-lg-9">
+      <!-- Filters Bar -->
+      <div class="bg-white rounded-3 p-3 mb-4 shadow-sm d-flex flex-wrap gap-3 align-items-center justify-content-between">
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="/articles" class="btn btn-sm <%= !currentCategory ? 'btn-primary' : 'btn-outline-secondary' %>">All</a>
+          <% if (Array.isArray(categories)) { categories.forEach(cat => { %>
+          <a href="/articles?category=<%= cat.slug %>" class="btn btn-sm <%= currentCategory === cat.slug ? 'btn-primary' : 'btn-outline-secondary' %>" style="<%= currentCategory === cat.slug ? 'background:'+cat.color+';border-color:'+cat.color : '' %>">
+            <i class="<%= cat.icon %> me-1"></i><%= cat.name %>
+          </a>
+          <% }) } %>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label class="form-label mb-0 text-muted" style="font-size:13px">Sort:</label>
+          <select class="form-select form-select-sm" style="width:auto" onchange="location.href='/articles?sort='+this.value+'<%= currentCategory ? '&category='+currentCategory : '' %>'">
+            <option value="latest" <%= currentSort==='latest'?'selected':'' %>>Latest</option>
+            <option value="popular" <%= currentSort==='popular'?'selected':'' %>>Most Views</option>
+            <option value="liked" <%= currentSort==='liked'?'selected':'' %>>Most Liked</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Results count -->
+      <p class="text-muted mb-3" style="font-size:14px">
+        Showing <%= ((pagination.page-1)*pagination.limit)+1 %>–<%= Math.min(pagination.page*pagination.limit, pagination.totalArticles) %> of <%= pagination.totalArticles %> articles
+        <% if (currentCategory) { %> in <strong><%= currentCategory %></strong><% } %>
+      </p>
+
+      <% if (articles.length === 0) { %>
+        <div class="empty-state bg-white rounded-3 p-5">
+          <i class="fas fa-search d-block mb-3" style="font-size:56px;color:var(--border)"></i>
+          <h5>No Articles Found</h5>
+          <p>Try a different category or check back later.</p>
+          <a href="/articles" class="btn btn-primary">View All Articles</a>
+        </div>
+      <% } else { %>
+      <div class="row g-4">
+        <% articles.forEach(art => { %>
+        <div class="col-md-6">
+          <div class="article-card h-100">
+            <div class="article-card-img" style="background:linear-gradient(135deg,<%= art.category_color||'var(--primary)' %>,var(--primary-dark));">
+              <div class="article-card-img-placeholder"><i class="fas fa-file-alt"></i></div>
+            </div>
+            <div class="article-card-body">
+              <% if (art.category_name) { %>
+              <a href="/articles?category=<%= art.category_slug %>" class="article-category" style="background:<%= art.category_color||'var(--primary)' %>"><%= art.category_name %></a>
+              <% } %>
+              <h3 class="article-card-title"><a href="/article/<%= art.slug %>"><%= art.title %></a></h3>
+              <p class="article-card-excerpt"><%= (art.excerpt||art.content.replace(/<[^>]+>/g,'')).substring(0,130)+'...' %></p>
+              <div class="article-card-meta">
+                <div class="article-meta-author"><i class="fas fa-user-circle"></i><%= art.first_name %> <%= art.last_name %></div>
+                <div class="article-meta-stats">
+                  <span><i class="fas fa-eye"></i><%= art.views %></span>
+                  <span><i class="fas fa-heart"></i><%= art.likes_count %></span>
+                  <span class="reading-time"><i class="fas fa-clock"></i><%= art.reading_time %>m</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+
+      <!-- Pagination -->
+      <% if (pagination.totalPages > 1) { %>
+      <nav class="mt-5 d-flex justify-content-center">
+        <ul class="pagination">
+          <li class="page-item <%= pagination.page===1?'disabled':'' %>">
+            <a class="page-link" href="/articles?page=<%= pagination.page-1 %><%= currentCategory?'&category='+currentCategory:'' %><%= currentSort?'&sort='+currentSort:'' %>">
+              <i class="fas fa-chevron-left"></i>
+            </a>
+          </li>
+          <% for(let i=1; i<=pagination.totalPages; i++) { if(Math.abs(i-pagination.page)<=2||i===1||i===pagination.totalPages) { %>
+          <li class="page-item <%= pagination.page===i?'active':'' %>">
+            <a class="page-link" href="/articles?page=<%= i %><%= currentCategory?'&category='+currentCategory:'' %><%= currentSort?'&sort='+currentSort:'' %>"><%= i %></a>
+          </li>
+          <% } else if(Math.abs(i-pagination.page)===3) { %><li class="page-item disabled"><span class="page-link">...</span></li><% } } %>
+          <li class="page-item <%= pagination.page===pagination.totalPages?'disabled':'' %>">
+            <a class="page-link" href="/articles?page=<%= pagination.page+1 %><%= currentCategory?'&category='+currentCategory:'' %><%= currentSort?'&sort='+currentSort:'' %>">
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <% } %>
+      <% } %>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-3">
+      <div class="widget">
+        <h6 class="widget-title"><i class="fas fa-search me-2"></i>Search Articles</h6>
+        <form action="/search" method="GET">
+          <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search...">
+            <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+          </div>
+        </form>
+      </div>
+      <div class="widget">
+        <h6 class="widget-title"><i class="fas fa-tags me-2"></i>Categories</h6>
+        <% if (Array.isArray(categories)) { categories.forEach(cat => { %>
+        <a href="/articles?category=<%= cat.slug %>" class="d-flex justify-content-between align-items-center py-2 border-bottom text-decoration-none" style="color:var(--text-dark)">
+          <span><span class="me-2" style="color:<%= cat.color %>"><i class="<%= cat.icon %>"></i></span><%= cat.name %></span>
+          <span class="badge rounded-pill" style="background:<%= cat.color %>"><%= cat.article_count %></span>
+        </a>
+        <% }) } %>
+      </div>
+      <% if (user) { %>
+      <div class="widget text-center" style="background:linear-gradient(135deg,var(--primary),var(--primary-light));color:white;">
+        <i class="fas fa-pen-nib d-block mb-3" style="font-size:36px;opacity:0.8"></i>
+        <h6 style="color:white;font-family:var(--font-display)">Share Your Research</h6>
+        <p style="font-size:13px;opacity:0.8;margin-bottom:16px">Contribute to the KCIC academic community</p>
+        <a href="/user/create-article" class="btn btn-light btn-sm fw-600">Write an Article</a>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

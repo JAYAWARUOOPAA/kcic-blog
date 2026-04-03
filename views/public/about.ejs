@@ -1,0 +1,119 @@
+<%- include('../partials/header', { title, user, currentPage }) %>
+<div class="page-header">
+  <div class="container text-center">
+    <h1><i class="fas fa-university me-2"></i>About KCIC Academic Blog</h1>
+    <p>A platform for scholarly excellence and academic discourse</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <!-- Mission -->
+  <div class="row align-items-center g-5 mb-5">
+    <div class="col-lg-6">
+      <div class="section-label"><i class="fas fa-bullseye me-1"></i>Our Mission</div>
+      <h2 class="section-title mb-3">Fostering Academic <span>Excellence</span></h2>
+      <div class="section-divider mb-4"></div>
+      <p>The KCIC Academic Blog is the official scholarly publication platform of Kings Cornerstone International College. We provide a space where students, faculty, and researchers can share their knowledge, insights, and discoveries with the academic community.</p>
+      <p>Our platform bridges the gap between classroom learning and real-world application, encouraging critical thinking and scholarly discourse across all disciplines.</p>
+      <div class="row g-3 mt-2">
+        <div class="col-6"><div class="p-3 rounded-3 text-center" style="background:#f0f7ff"><i class="fas fa-pen-nib fa-2x mb-2" style="color:var(--primary)"></i><br><strong>Quality Writing</strong></div></div>
+        <div class="col-6"><div class="p-3 rounded-3 text-center" style="background:#f0fff4"><i class="fas fa-microscope fa-2x mb-2" style="color:var(--success)"></i><br><strong>Research Focus</strong></div></div>
+        <div class="col-6"><div class="p-3 rounded-3 text-center" style="background:#fff8e1"><i class="fas fa-users fa-2x mb-2" style="color:var(--warning)"></i><br><strong>Community Driven</strong></div></div>
+        <div class="col-6"><div class="p-3 rounded-3 text-center" style="background:#fff5f5"><i class="fas fa-shield-alt fa-2x mb-2" style="color:var(--danger)"></i><br><strong>Peer Reviewed</strong></div></div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div style="background:linear-gradient(135deg,var(--primary-dark),var(--primary-light));border-radius:var(--radius);padding:40px;color:white;text-align:center">
+        <i class="fas fa-graduation-cap" style="font-size:80px;opacity:0.3;margin-bottom:20px;display:block"></i>
+        <h3 style="font-family:var(--font-display);font-size:28px">Kings Cornerstone<br>International College</h3>
+        <p style="opacity:0.8;margin-top:12px">Empowering minds. Building futures.<br>One article at a time.</p>
+        <a href="/auth/register" class="btn btn-light mt-3 fw-600">Join Our Community</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Values -->
+  <div class="row g-4 mb-5">
+    <div class="col-12 text-center mb-3">
+      <div class="section-label"><i class="fas fa-star me-1"></i>Our Values</div>
+      <h2 class="section-title">What We <span>Stand For</span></h2>
+      <div class="section-divider mx-auto"></div>
+    </div>
+    <% [
+      {icon:'fas fa-book-open',color:'var(--primary)',title:'Academic Integrity',desc:'We uphold the highest standards of scholarly honesty and ethical research practices.'},
+      {icon:'fas fa-lightbulb',color:'#f59e0b',title:'Innovation',desc:'We encourage fresh perspectives and novel approaches to academic inquiry.'},
+      {icon:'fas fa-handshake',color:'var(--success)',title:'Inclusivity',desc:'We welcome contributions from all disciplines and academic backgrounds.'},
+      {icon:'fas fa-globe',color:'#8b5cf6',title:'Global Perspective',desc:'We embrace diverse viewpoints and international academic discourse.'}
+    ].forEach(v => { %>
+    <div class="col-md-6 col-lg-3">
+      <div class="text-center p-4 bg-white rounded-3 shadow-sm h-100">
+        <div style="width:64px;height:64px;border-radius:50%;background:<%= v.color %>20;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <i class="<%= v.icon %> fa-2x" style="color:<%= v.color %>"></i>
+        </div>
+        <h5 style="font-family:var(--font-display);font-weight:700"><%= v.title %></h5>
+        <p class="text-muted mb-0" style="font-size:14px"><%= v.desc %></p>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+
+  <!-- Team -->
+  <% if (team.length > 0) { %>
+  <div class="mb-5">
+    <div class="text-center mb-4">
+      <div class="section-label"><i class="fas fa-users me-1"></i>Our Team</div>
+      <h2 class="section-title">Editorial <span>Board</span></h2>
+      <div class="section-divider mx-auto"></div>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <% team.forEach(member => { %>
+      <div class="col-lg-3 col-md-4 col-6">
+        <div class="team-card">
+          <% if (member.avatar_url) { %>
+            <img src="<%= member.avatar_url %>" class="team-avatar" alt="">
+          <% } else { %>
+            <div class="team-initials"><%= (member.first_name||'A')[0] %></div>
+          <% } %>
+          <div class="team-name"><%= member.first_name %> <%= member.last_name %></div>
+          <div class="team-role"><span class="badge bg-danger"><%= member.role %></span></div>
+          <% if (member.department) { %><p class="mt-1 mb-0 text-muted" style="font-size:12px"><%= member.department %></p><% } %>
+          <% if (member.bio) { %><p class="mt-2 mb-0 text-muted" style="font-size:13px"><%= member.bio.substring(0,80) %>...</p><% } %>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Submission Guidelines -->
+  <div class="bg-white rounded-3 p-5 shadow-sm">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-6">
+        <h3 style="font-family:var(--font-display);color:var(--primary)"><i class="fas fa-file-upload me-2"></i>Submission Guidelines</h3>
+        <ul class="mt-3" style="font-size:15px;line-height:2">
+          <li>Articles must be original and not published elsewhere</li>
+          <li>Minimum 500 words; maximum 5,000 words</li>
+          <li>Must be relevant to academic or scholarly topics</li>
+          <li>Proper citations and references are required</li>
+          <li>All submissions are reviewed by our editorial team</li>
+          <li>Approval typically takes 3–5 business days</li>
+        </ul>
+      </div>
+      <div class="col-lg-6 text-center">
+        <% if (user) { %>
+        <i class="fas fa-pen-nib fa-4x mb-4" style="color:var(--primary);opacity:0.5"></i>
+        <h5 style="font-family:var(--font-display)">Ready to Contribute?</h5>
+        <p class="text-muted">Share your research and insights with our community.</p>
+        <a href="/user/create-article" class="btn btn-primary btn-lg px-5"><i class="fas fa-plus me-2"></i>Submit an Article</a>
+        <% } else { %>
+        <i class="fas fa-user-plus fa-4x mb-4" style="color:var(--primary);opacity:0.5"></i>
+        <h5 style="font-family:var(--font-display)">Join to Contribute</h5>
+        <p class="text-muted">Create a free account to start publishing.</p>
+        <a href="/auth/register" class="btn btn-primary btn-lg px-5 me-2"><i class="fas fa-user-plus me-2"></i>Register</a>
+        <a href="/auth/login" class="btn btn-outline-primary btn-lg px-5"><i class="fas fa-sign-in-alt me-2"></i>Login</a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>
