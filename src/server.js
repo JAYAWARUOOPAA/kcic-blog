@@ -1,57 +1,58 @@
 require('dotenv').config();
 
-const fastify = require('fastify')({ 
-  logger: true, // enable logs in production
-  trustProxy: true
+const fastify = require('fastify')({
+logger: true,
+trustProxy: true
 });
 
 const path = require('path');
 
 // Static files
 fastify.register(require('@fastify/static'), {
-  root: path.join(__dirname, '../public'),
-  prefix: '/public/'
+root: path.join(__dirname, '../public'),
+prefix: '/public/'
 });
 
 // Plugins
 fastify.register(require('@fastify/formbody'));
 
 fastify.register(require('@fastify/multipart'), {
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
 
 fastify.register(require('@fastify/cookie'));
 
 // ✅ FIXED SESSION CONFIG
 fastify.register(require('@fastify/session'), {
-  secret: process.env.SESSION_SECRET,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // IMPORTANT for Render
-    httpOnly: true,
-    maxAge: 86400000 * 7 // 7 days
-  },
-  saveUninitialized: false
+secret: process.env.SESSION_SECRET,
+cookie: {
+secure: process.env.NODE_ENV === 'production', // true on Render
+httpOnly: true,
+sameSite: 'none', // ⭐ VERY IMPORTANT FIX
+maxAge: 86400000 * 7 // 7 days
+},
+saveUninitialized: false
 });
 
 // Template engine (EJS)
 fastify.register(require('@fastify/view'), {
-  engine: { ejs: require('ejs') },
-  root: path.join(__dirname, '../views'),
-  layout: false,
-  options: { rmWhitespace: false }
+engine: { ejs: require('ejs') },
+root: path.join(__dirname, '../views'),
+layout: false,
+options: { rmWhitespace: false }
 });
 
 // Auth helpers
 fastify.decorateRequest('isAuthenticated', function() {
-  return !!(this.session && this.session.user);
+return !!(this.session && this.session.user);
 });
 
 fastify.decorateRequest('isAdmin', function() {
-  return !!(
-    this.session &&
-    this.session.user &&
-    this.session.user.role === 'admin'
-  );
+return !!(
+this.session &&
+this.session.user &&
+this.session.user.role === 'admin'
+);
 });
 
 // Routes
@@ -63,43 +64,46 @@ fastify.register(require('./routes/api'), { prefix: '/api' });
 
 // 404 handler
 fastify.setNotFoundHandler(async (req, reply) => {
-  return reply.view('public/404.ejs', {
-    user: req.session?.user || null,
-    title: '404 - Page Not Found'
-  });
+return reply.view('public/404.ejs', {
+user: req.session?.user || null,
+title: '404 - Page Not Found'
+});
 });
 
 // Error handler
 fastify.setErrorHandler(async (error, req, reply) => {
-  console.error(error);
+console.error(error);
 
-  const statusCode = error.statusCode || 500;
+const statusCode = error.statusCode || 500;
 
-  return reply.status(statusCode).view('public/error.ejs', {
-    user: req.session?.user || null,
-    title: 'Error',
-    error:
-      process.env.NODE_ENV === 'development'
-        ? error.message
-        : 'An error occurred'
-  });
+return reply.status(statusCode).view('public/error.ejs', {
+user: req.session?.user || null,
+title: 'Error',
+error:
+process.env.NODE_ENV === 'development'
+? error.message
+: 'An error occurred'
+});
 });
 
 // Start server
 const start = async () => {
-  try {
-    const PORT = process.env.PORT || 3000;
+try {
+const PORT = process.env.PORT || 3000;
 
-    await fastify.listen({
-      port: PORT,
-      host: '0.0.0.0'
-    });
+```
+await fastify.listen({
+  port: PORT,
+  host: '0.0.0.0'
+});
 
-    console.log(`🚀 KCIC Academic Blog running on port ${PORT}`);
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
+console.log(`🚀 KCIC Academic Blog running on port ${PORT}`);
+```
+
+} catch (err) {
+fastify.log.error(err);
+process.exit(1);
+}
 };
 
 start();
