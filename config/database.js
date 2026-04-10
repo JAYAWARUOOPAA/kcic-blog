@@ -1,7 +1,12 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const isProduction = process.env.NODE_ENV === 'production';
+console.log("DB ENV CHECK:", {
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+});
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -10,13 +15,13 @@ const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
 
- ssl: {
-  rejectUnauthorized: false
-},
+  ssl: {
+    rejectUnauthorized: false
+  },
 
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000,
 });
 
 pool.on('connect', () => {
@@ -24,8 +29,9 @@ pool.on('connect', () => {
 });
 
 pool.on('error', (err) => {
-  console.error('❌ Unexpected error on idle client', err);
-  process.exit(-1);
+  console.error('❌ Database error:', err.message);
+  // ❌ REMOVE process.exit
+  // process.exit(-1);
 });
 
 module.exports = {
