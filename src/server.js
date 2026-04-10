@@ -22,13 +22,13 @@ limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 
 fastify.register(require('@fastify/cookie'));
 
-// ✅ FIXED SESSION CONFIG
+// Session config
 fastify.register(require('@fastify/session'), {
 secret: process.env.SESSION_SECRET,
 cookie: {
-secure: process.env.NODE_ENV === 'production', // true on Render
+secure: process.env.NODE_ENV === 'production',
 httpOnly: true,
-sameSite: 'none', // ⭐ VERY IMPORTANT FIX
+sameSite: 'none',
 maxAge: 86400000 * 7 // 7 days
 },
 saveUninitialized: false
@@ -43,11 +43,11 @@ options: { rmWhitespace: false }
 });
 
 // Auth helpers
-fastify.decorateRequest('isAuthenticated', function() {
+fastify.decorateRequest('isAuthenticated', function () {
 return !!(this.session && this.session.user);
 });
 
-fastify.decorateRequest('isAdmin', function() {
+fastify.decorateRequest('isAdmin', function () {
 return !!(
 this.session &&
 this.session.user &&
