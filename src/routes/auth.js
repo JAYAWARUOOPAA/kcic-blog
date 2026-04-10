@@ -47,7 +47,6 @@ try {
     });
   }
 
-  // Role validation
   if (role === 'admin' && user.role !== 'admin') {
     return reply.view('auth/login.ejs', {
       title: 'Login',
@@ -57,13 +56,11 @@ try {
     });
   }
 
-  // Update last login
   await db.query(
     'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
     [user.id]
   );
 
-  // Store session
   req.session.user = {
     id: user.id,
     uuid: user.uuid,
@@ -178,143 +175,6 @@ try {
 fastify.get('/logout', async (req, reply) => {
 req.session.destroy();
 return reply.redirect('/');
-});
-
-// Forgot password page
-fastify.get('/forgot-password', { preHandler: requireGuest }, async (req, reply) => {
-return reply.view('auth/forgot-password.ejs', {
-title: 'Forgot Password - KCIC Academic Blog',
-user: null,
-error: null,
-success: null
-});
-});
-
-// Forgot password POST
-fastify.post('/forgot-password', async (req, reply) => {
-const { email } = req.body;
-
-```
-try {
-  const result = await db.query(
-    'SELECT * FROM users WHERE email = $1',
-    [email]
-  );
-
-  if (result.rows.length > 0) {
-    const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 3600000);
-
-    await db.query(
-      'UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE email = $3',
-      [token, expires, email]
-    );
-
-    console.log("Password reset link generated");
-  }
-
-  return reply.view('auth/forgot-password.ejs', {
-    title: 'Forgot Password',
-    user: null,
-    error: null,
-    success: 'If that email exists, a reset link has been sent.'
-  });
-
-} catch (err) {
-  return reply.view('auth/forgot-password.ejs', {
-    title: 'Forgot Password',
-    user: null,
-    error: 'An error occurred.',
-    success: null
-  });
-}
-```
-
-});
-
-// Reset password page
-fastify.get('/reset-password/:token', async (req, reply) => {
-const { token } = req.params;
-
-```
-const result = await db.query(
-  'SELECT id FROM users WHERE reset_token = $1 AND reset_token_expires > NOW()',
-  [token]
-);
-
-if (result.rows.length === 0) {
-  return reply.view('auth/reset-password.ejs', {
-    title: 'Reset Password',
-    user: null,
-    token,
-    error: 'Invalid or expired reset link',
-    success: null
-  });
-}
-
-return reply.view('auth/reset-password.ejs', {
-  title: 'Reset Password - KCIC Academic Blog',
-  user: null,
-  token,
-  error: null,
-  success: null
-});
-```
-
-});
-
-// Reset password POST
-fastify.post('/reset-password/:token', async (req, reply) => {
-const { token } = req.params;
-const { password, confirm_password } = req.body;
-
-```
-if (password !== confirm_password) {
-  return reply.view('auth/reset-password.ejs', {
-    title: 'Reset Password',
-    user: null,
-    token,
-    error: 'Passwords do not match',
-    success: null
-  });
-}
-
-try {
-  const result = await db.query(
-    'SELECT id FROM users WHERE reset_token = $1 AND reset_token_expires > NOW()',
-    [token]
-  );
-
-  if (result.rows.length === 0) {
-    return reply.view('auth/reset-password.ejs', {
-      title: 'Reset Password',
-      user: null,
-      token,
-      error: 'Invalid or expired reset link',
-      success: null
-    });
-  }
-
-  const hash = await bcrypt.hash(password, 12);
-
-  await db.query(
-    'UPDATE users SET password_hash = $1, reset_token = NULL, reset_token_expires = NULL WHERE id = $2',
-    [hash, result.rows[0].id]
-  );
-
-  return reply.redirect('/auth/login?registered=true');
-
-} catch (err) {
-  return reply.view('auth/reset-password.ejs', {
-    title: 'Reset Password',
-    user: null,
-    token,
-    error: 'Failed to reset password.',
-    success: null
-  });
-}
-```
-
 });
 
 };
