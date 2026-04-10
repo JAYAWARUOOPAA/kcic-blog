@@ -97,7 +97,7 @@ await fastify.listen({
   host: '0.0.0.0'
 });
 
-console.log(`🚀 KCIC Academic Blog running on port ${PORT}`);
+console.log("KCIC Academic Blog running on port " + PORT);
 ```
 
 } catch (err) {
