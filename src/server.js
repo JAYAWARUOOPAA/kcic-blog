@@ -88,22 +88,20 @@ process.env.NODE_ENV === 'development'
 
 // Start server
 const start = async () => {
-try {
-const PORT = process.env.PORT || 3000;
+  try {
+    const PORT = process.env.PORT || 3000;
 
-```
-await fastify.listen({
-  port: PORT,
-  host: '0.0.0.0'
-});
+    await fastify.listen({
+      port: PORT,
+      host: '0.0.0.0'
+    });
 
-console.log("KCIC Academic Blog running on port " + PORT);
-```
+    console.log("Server running on port " + PORT);
 
-} catch (err) {
-fastify.log.error(err);
-process.exit(1);
-}
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
 };
 
 start();
