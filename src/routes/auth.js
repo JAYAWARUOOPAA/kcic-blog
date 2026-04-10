@@ -150,10 +150,9 @@ try {
   const userRole = role === 'admin' ? 'admin' : 'user';
   const hash = await bcrypt.hash(password, 12);
 
+  // ✅ FIXED SQL (no backticks)
   await db.query(
-    `INSERT INTO users 
-    (username, email, password_hash, role, first_name, last_name, department, student_id, is_verified) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)`,
+    "INSERT INTO users (username, email, password_hash, role, first_name, last_name, department, student_id, is_verified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)",
     [username, email, hash, userRole, first_name, last_name, department || null, student_id || null]
   );
 
